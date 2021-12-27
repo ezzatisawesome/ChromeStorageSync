@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "minimongo": "^6.11.3"
+  },
+  "devDependencies": {
+    "@types/async": "^3.2.12",
+    "@types/lodash": "^4.14.178"
+  }
+}

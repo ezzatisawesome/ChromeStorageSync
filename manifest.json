@@ -1,0 +1,18 @@
+{
+    "name": "Chrome Local Storage MongoDb Sync",
+    "version": "0.0.1",
+    "manifest_version": 2,
+    "omnibox": {
+        "keyword": "nt"
+    },
+    "permissions": [
+        "storage",
+        "tabs",
+        "<all_urls>"
+    ],
+    "background": {
+        "page": "background.html",
+        "persistent": false
+    },
+    "content_security_policy": "script-src 'self' https://cdn.jsdelivr.net/;  object-src 'self'"
+}

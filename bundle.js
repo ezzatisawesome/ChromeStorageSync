@@ -1,30 +1,74 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var minimongo = require("minimongo");
-var LocalDb = minimongo.LocalStorageDb;
-var db = new LocalDb()
-db.addCollection("annotations")
+
+var LocalDb = minimongo.IndexedDb;
+var db = new LocalDb({ namespace: 'TestingStorage' })
+
+const collections = { C1: 'c1', C2: 'c2' }
+
+chrome.runtime.onInstalled.addListener(() => {
+    db.addCollection(collections.C1)
+    db.addCollection(collections.C2)
+})
 
 chrome.omnibox.onInputEntered.addListener((text) => {
     const textSplit = text.split(' ')
-    const operation = textSplit[0]
-    const data = textSplit[1]
+    const collection = textSplit[1]
 
-    switch (operation) {
-        case 'C':
-            const doc = { writing: data }
-            db.annotations.upsert(doc, () => {
-                console.log(db)
-            })
+    const data = { [`${textSplit[2]}`]: textSplit[3] }
+
+    switch (textSplit[0]) {
+        case 'c':
+            if (collection === collections.C1) {
+                db.collections[collections.C1].upsert(data)
+            }
+            else {
+                db.collections[collections.C2].upsert(data)
+            }
             break
-        case 'R':
-            db.annotations.findOne({ writing: data }, {}, (res) => {
-                console.log("Annotation data: " + res.name);
-            })
+        case 'r':
+            if (collection === collections.C1) {
+                console.log(data)
+                db.collections[collections.C1].findOne(data, {}, function (res) {
+                    console.log(res)
+                })
+            }
+            else {
+                db.collections[collections.C2].find(data, {}, (res) => {
+                    console.log(res)
+                })
+            }
+            break
+        case 'd':
+            if (collection === collections.C1) {
+                db.collections[collections.C1].remove(data, () => { })
+            }
+            else {
+                db.collections[collections.C2].remove(data, () => { })
+            }
             break
         default:
             console.log(`${operation} is not a valid operation.`)
     }
 })
+
+// The Road goes ever on and on,
+// Down from the door where it began.
+// Now far ahead the Road has gone,
+// And I must follow, if I can,
+// Pursuing it with eager feet,
+// Until it joins some larger way
+// Where many paths and errands meet.
+// And whither then? I cannot say.
+
+// The Road goes ever on and on
+// Out from the door where it began.
+// Now far ahead the Road has gone,
+// Let others follow it who can!
+// Let them a journey new begin,
+// But I at last with weary feet
+// Will turn towards the lighted inn,
+// My evening-rest and sleep to meet.
 },{"minimongo":29}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });

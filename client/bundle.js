@@ -1,20 +1,19 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const { remove } = require('lodash');
-const { mongoUrl } = require('./mongoUrl.mjs')
 var minimongo = require('minimongo');
 
 var LocalDb = minimongo.IndexedDb;
 var RemoteDb = minimongo.RemoteDb
 var localDb = new LocalDb({ namespace: 'TestingStorage' })
-var remoteDb = new RemoteDb(mongoUrl)
+var remoteDb = new RemoteDb('http://localhost:3000/')
+
+console.log(remoteDb)
 
 const collections = { C1: 'c1', C2: 'c2' }
 
 chrome.runtime.onInstalled.addListener(() => {
     localDb.addCollection(collections.C1)
-    localDb.addCollection(collections.C2)
     remoteDb.addCollection(collections.C1)
-    remoteDb.addCollection(collections.C2)
 })
 
 chrome.omnibox.onInputEntered.addListener((text) => {
@@ -23,7 +22,7 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     const data = { [`${textSplit[3]}`]: textSplit[4] }
 
 
-    if (textSplit[0] === 'L') {
+    if (textSplit[0] === 'l') {
         switch (textSplit[1]) {
             case 'c':
                 if (collection === collections.C1) {
@@ -61,8 +60,15 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     } else {
         switch (textSplit[1]) {
             case 'c':
+                console.log('case "c"')
                 if (collection === collections.C1) {
-                    remoteDb.collections[collections.C1].upsert(data)
+                    console.log('upserting data')
+                    try {
+                        console.log(data)
+                        remoteDb.collections[collections.C1].upsert(data)
+                        console.log(data)
+                    }
+                    catch { console.log('err') }
                 }
                 else {
                     remoteDb.collections[collections.C2].upsert(data)
@@ -113,9 +119,7 @@ chrome.omnibox.onInputEntered.addListener((text) => {
 // But I at last with weary feet
 // Will turn towards the lighted inn,
 // My evening-rest and sleep to meet.
-},{"./mongoUrl.mjs":2,"lodash":21,"minimongo":30}],2:[function(require,module,exports){
-module.exports = mongoUrl = 'mongodb+srv://ezzat:<bingbong>@spadetesting.cmap8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-},{}],3:[function(require,module,exports){
+},{"lodash":20,"minimongo":29}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var meta_1 = require("@turf/meta");
@@ -154,7 +158,7 @@ function bbox(geojson) {
 bbox["default"] = bbox;
 exports.default = bbox;
 
-},{"@turf/meta":13}],4:[function(require,module,exports){
+},{"@turf/meta":12}],3:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -327,7 +331,7 @@ function isPointOnLineSegment(lineSegmentStart, lineSegmentEnd, pt, incEnd) {
 }
 exports.default = booleanCrosses;
 
-},{"@turf/boolean-point-in-polygon":5,"@turf/helpers":8,"@turf/invariant":10,"@turf/line-intersect":11,"@turf/polygon-to-line":14}],5:[function(require,module,exports){
+},{"@turf/boolean-point-in-polygon":4,"@turf/helpers":7,"@turf/invariant":9,"@turf/line-intersect":10,"@turf/polygon-to-line":13}],4:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var invariant_1 = require("@turf/invariant");
@@ -447,7 +451,7 @@ function inBBox(pt, bbox) {
     return (bbox[0] <= pt[0] && bbox[1] <= pt[1] && bbox[2] >= pt[0] && bbox[3] >= pt[1]);
 }
 
-},{"@turf/invariant":10}],6:[function(require,module,exports){
+},{"@turf/invariant":9}],5:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var invariant_1 = require("@turf/invariant");
@@ -553,7 +557,7 @@ function isPointOnLineSegment(lineSegmentStart, lineSegmentEnd, pt, excludeBound
 }
 exports.default = booleanPointOnLine;
 
-},{"@turf/invariant":10}],7:[function(require,module,exports){
+},{"@turf/invariant":9}],6:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -775,7 +779,7 @@ function getMidpoint(pair1, pair2) {
 }
 exports.default = booleanWithin;
 
-},{"@turf/bbox":3,"@turf/boolean-point-in-polygon":5,"@turf/boolean-point-on-line":6,"@turf/invariant":10}],8:[function(require,module,exports){
+},{"@turf/bbox":2,"@turf/boolean-point-in-polygon":4,"@turf/boolean-point-on-line":5,"@turf/invariant":9}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 /**
@@ -1501,7 +1505,7 @@ function validateId(id) {
 }
 exports.validateId = validateId;
 
-},{}],9:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -1559,7 +1563,7 @@ function intersect(poly1, poly2, options) {
 }
 exports.default = intersect;
 
-},{"@turf/helpers":8,"@turf/invariant":10,"polygon-clipping":36}],10:[function(require,module,exports){
+},{"@turf/helpers":7,"@turf/invariant":9,"polygon-clipping":35}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("@turf/helpers");
@@ -1794,7 +1798,7 @@ function getType(geojson, _name) {
 }
 exports.getType = getType;
 
-},{"@turf/helpers":8}],11:[function(require,module,exports){
+},{"@turf/helpers":7}],10:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -1908,7 +1912,7 @@ function intersects(line1, line2) {
 }
 exports.default = lineIntersect;
 
-},{"@turf/helpers":8,"@turf/invariant":10,"@turf/line-segment":12,"@turf/meta":13,"geojson-rbush":17}],12:[function(require,module,exports){
+},{"@turf/helpers":7,"@turf/invariant":9,"@turf/line-segment":11,"@turf/meta":12,"geojson-rbush":16}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("@turf/helpers");
@@ -2005,7 +2009,7 @@ function bbox(coords1, coords2) {
 }
 exports.default = lineSegment;
 
-},{"@turf/helpers":8,"@turf/invariant":10,"@turf/meta":13}],13:[function(require,module,exports){
+},{"@turf/helpers":7,"@turf/invariant":9,"@turf/meta":12}],12:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
@@ -3428,7 +3432,7 @@ exports.propReduce = propReduce;
 exports.segmentEach = segmentEach;
 exports.segmentReduce = segmentReduce;
 
-},{"@turf/helpers":8}],14:[function(require,module,exports){
+},{"@turf/helpers":7}],13:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var helpers_1 = require("@turf/helpers");
@@ -3511,7 +3515,7 @@ function coordsToLine(coords, properties) {
 }
 exports.coordsToLine = coordsToLine;
 
-},{"@turf/helpers":8,"@turf/invariant":10}],15:[function(require,module,exports){
+},{"@turf/helpers":7,"@turf/invariant":9}],14:[function(require,module,exports){
 (function (process,global,setImmediate){(function (){
 /*!
  * async
@@ -4780,7 +4784,7 @@ exports.coordsToLine = coordsToLine;
 }());
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
-},{"_process":38,"timers":39}],16:[function(require,module,exports){
+},{"_process":37,"timers":38}],15:[function(require,module,exports){
 /*!
   * Bowser - a browser detector
   * https://github.com/ded/bowser
@@ -5058,7 +5062,7 @@ exports.coordsToLine = coordsToLine;
   return bowser
 });
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 var rbush = require('rbush');
 var helpers = require('@turf/helpers');
 var meta = require('@turf/meta');
@@ -5268,7 +5272,7 @@ function geojsonRbush(maxEntries) {
 module.exports = geojsonRbush;
 module.exports.default = geojsonRbush;
 
-},{"@turf/bbox":3,"@turf/helpers":8,"@turf/meta":13,"rbush":37}],18:[function(require,module,exports){
+},{"@turf/bbox":2,"@turf/helpers":7,"@turf/meta":12,"rbush":36}],17:[function(require,module,exports){
 /*global window:false, self:false, define:false, module:false */
 
 /**
@@ -6675,7 +6679,7 @@ module.exports.default = geojsonRbush;
 
 }, this);
 
-},{}],19:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 /*!
  * jQuery JavaScript Library v3.6.0
  * https://jquery.com/
@@ -17558,7 +17562,7 @@ if ( typeof noGlobal === "undefined" ) {
 return jQuery;
 } );
 
-},{}],20:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process,global){(function (){
 /*
  * [js-sha1]{@link https://github.com/emn178/js-sha1}
@@ -17933,7 +17937,7 @@ return jQuery;
 })();
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":38}],21:[function(require,module,exports){
+},{"_process":37}],20:[function(require,module,exports){
 (function (global){(function (){
 /**
  * @license
@@ -35146,7 +35150,7 @@ return jQuery;
 }.call(this));
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],22:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -35465,7 +35469,7 @@ EJSON.clone = function (v) {
 };
 exports.default = EJSON;
 
-},{"lodash":21}],23:[function(require,module,exports){
+},{"lodash":20}],22:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -35848,7 +35852,7 @@ class HybridCollection {
 }
 exports.HybridCollection = HybridCollection;
 
-},{"./utils":35,"lodash":21}],24:[function(require,module,exports){
+},{"./utils":34,"lodash":20}],23:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36328,7 +36332,7 @@ class IndexedDbCollection {
     }
 }
 
-},{"./selector":33,"./utils":35,"async":15,"idb-wrapper":18,"lodash":21}],25:[function(require,module,exports){
+},{"./selector":32,"./utils":34,"async":14,"idb-wrapper":17,"lodash":20}],24:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36683,7 +36687,7 @@ class Collection {
     }
 }
 
-},{"./selector":33,"./utils":35,"async":15,"lodash":21}],26:[function(require,module,exports){
+},{"./selector":32,"./utils":34,"async":14,"lodash":20}],25:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -36984,7 +36988,7 @@ class Collection {
     }
 }
 
-},{"./selector":33,"./utils":35,"async":15,"lodash":21}],27:[function(require,module,exports){
+},{"./selector":32,"./utils":34,"async":14,"lodash":20}],26:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -37292,7 +37296,7 @@ class Collection {
     }
 }
 
-},{"./jQueryHttpClient":31,"./quickfind":32,"./utils":35,"lodash":21}],28:[function(require,module,exports){
+},{"./jQueryHttpClient":30,"./quickfind":31,"./utils":34,"lodash":20}],27:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -37518,7 +37522,7 @@ class Collection {
     }
 }
 
-},{"./selector":33,"./utils":35,"lodash":21}],29:[function(require,module,exports){
+},{"./selector":32,"./utils":34,"lodash":20}],28:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -38088,7 +38092,7 @@ class Collection {
     }
 }
 
-},{"./selector":33,"./utils":35,"async":15,"lodash":21}],30:[function(require,module,exports){
+},{"./selector":32,"./utils":34,"async":14,"lodash":20}],29:[function(require,module,exports){
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
@@ -38139,7 +38143,7 @@ const ReplicatingDb_1 = __importDefault(require("./ReplicatingDb"));
 Object.defineProperty(exports, "ReplicatingDb", { enumerable: true, get: function () { return ReplicatingDb_1.default; } });
 exports.default = { quickfind, utils, MemoryDb: MemoryDb_1.default, LocalStorageDb: LocalStorageDb_1.default, IndexedDb: IndexedDb_1.default, WebSQLDb: WebSQLDb_1.default, RemoteDb: RemoteDb_1.default, HybridDb: HybridDb_1.default, ReplicatingDb: ReplicatingDb_1.default, HybridCollection: HybridDb_1.HybridCollection };
 
-},{"./HybridDb":23,"./IndexedDb":24,"./LocalStorageDb":25,"./MemoryDb":26,"./RemoteDb":27,"./ReplicatingDb":28,"./WebSQLDb":29,"./quickfind":32,"./types":34,"./utils":35}],31:[function(require,module,exports){
+},{"./HybridDb":22,"./IndexedDb":23,"./LocalStorageDb":24,"./MemoryDb":25,"./RemoteDb":26,"./ReplicatingDb":27,"./WebSQLDb":28,"./quickfind":31,"./types":33,"./utils":34}],30:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -38183,7 +38187,7 @@ function default_1(method, url, params, data, success, error) {
 }
 exports.default = default_1;
 
-},{"jquery":19}],32:[function(require,module,exports){
+},{"jquery":18}],31:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -38266,7 +38270,7 @@ function hashRows(rows) {
     return hash.hex().substr(0, 20);
 }
 
-},{"./selector":33,"js-sha1":20,"lodash":21}],33:[function(require,module,exports){
+},{"./selector":32,"js-sha1":19,"lodash":20}],32:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -38972,11 +38976,11 @@ LocalCollection._compileSort = function (spec) {
 };
 exports.compileSort = LocalCollection._compileSort;
 
-},{"./EJSON":22,"lodash":21}],34:[function(require,module,exports){
+},{"./EJSON":21,"lodash":20}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 
-},{}],35:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
@@ -39386,7 +39390,7 @@ function regularizeUpsert(docs, bases, success, error) {
 }
 exports.regularizeUpsert = regularizeUpsert;
 
-},{"./HybridDb":23,"./IndexedDb":24,"./LocalStorageDb":25,"./MemoryDb":26,"./WebSQLDb":29,"./selector":33,"@turf/boolean-crosses":4,"@turf/boolean-point-in-polygon":5,"@turf/boolean-within":7,"@turf/intersect":9,"async":15,"bowser":16,"lodash":21}],36:[function(require,module,exports){
+},{"./HybridDb":22,"./IndexedDb":23,"./LocalStorageDb":24,"./MemoryDb":25,"./WebSQLDb":28,"./selector":32,"@turf/boolean-crosses":3,"@turf/boolean-point-in-polygon":4,"@turf/boolean-within":6,"@turf/intersect":8,"async":14,"bowser":15,"lodash":20}],35:[function(require,module,exports){
 (function (process){(function (){
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
@@ -41947,10 +41951,10 @@ exports.regularizeUpsert = regularizeUpsert;
 })));
 
 }).call(this)}).call(this,require('_process'))
-},{"_process":38}],37:[function(require,module,exports){
+},{"_process":37}],36:[function(require,module,exports){
 !function(t,i){"object"==typeof exports&&"undefined"!=typeof module?module.exports=i():"function"==typeof define&&define.amd?define(i):(t=t||self).RBush=i()}(this,function(){"use strict";function t(t,r,e,a,h){!function t(n,r,e,a,h){for(;a>e;){if(a-e>600){var o=a-e+1,s=r-e+1,l=Math.log(o),f=.5*Math.exp(2*l/3),u=.5*Math.sqrt(l*f*(o-f)/o)*(s-o/2<0?-1:1),m=Math.max(e,Math.floor(r-s*f/o+u)),c=Math.min(a,Math.floor(r+(o-s)*f/o+u));t(n,r,m,c,h)}var p=n[r],d=e,x=a;for(i(n,e,r),h(n[a],p)>0&&i(n,e,a);d<x;){for(i(n,d,x),d++,x--;h(n[d],p)<0;)d++;for(;h(n[x],p)>0;)x--}0===h(n[e],p)?i(n,e,x):i(n,++x,a),x<=r&&(e=x+1),r<=x&&(a=x-1)}}(t,r,e||0,a||t.length-1,h||n)}function i(t,i,n){var r=t[i];t[i]=t[n],t[n]=r}function n(t,i){return t<i?-1:t>i?1:0}var r=function(t){void 0===t&&(t=9),this._maxEntries=Math.max(4,t),this._minEntries=Math.max(2,Math.ceil(.4*this._maxEntries)),this.clear()};function e(t,i,n){if(!n)return i.indexOf(t);for(var r=0;r<i.length;r++)if(n(t,i[r]))return r;return-1}function a(t,i){h(t,0,t.children.length,i,t)}function h(t,i,n,r,e){e||(e=p(null)),e.minX=1/0,e.minY=1/0,e.maxX=-1/0,e.maxY=-1/0;for(var a=i;a<n;a++){var h=t.children[a];o(e,t.leaf?r(h):h)}return e}function o(t,i){return t.minX=Math.min(t.minX,i.minX),t.minY=Math.min(t.minY,i.minY),t.maxX=Math.max(t.maxX,i.maxX),t.maxY=Math.max(t.maxY,i.maxY),t}function s(t,i){return t.minX-i.minX}function l(t,i){return t.minY-i.minY}function f(t){return(t.maxX-t.minX)*(t.maxY-t.minY)}function u(t){return t.maxX-t.minX+(t.maxY-t.minY)}function m(t,i){return t.minX<=i.minX&&t.minY<=i.minY&&i.maxX<=t.maxX&&i.maxY<=t.maxY}function c(t,i){return i.minX<=t.maxX&&i.minY<=t.maxY&&i.maxX>=t.minX&&i.maxY>=t.minY}function p(t){return{children:t,height:1,leaf:!0,minX:1/0,minY:1/0,maxX:-1/0,maxY:-1/0}}function d(i,n,r,e,a){for(var h=[n,r];h.length;)if(!((r=h.pop())-(n=h.pop())<=e)){var o=n+Math.ceil((r-n)/e/2)*e;t(i,o,n,r,a),h.push(n,o,o,r)}}return r.prototype.all=function(){return this._all(this.data,[])},r.prototype.search=function(t){var i=this.data,n=[];if(!c(t,i))return n;for(var r=this.toBBox,e=[];i;){for(var a=0;a<i.children.length;a++){var h=i.children[a],o=i.leaf?r(h):h;c(t,o)&&(i.leaf?n.push(h):m(t,o)?this._all(h,n):e.push(h))}i=e.pop()}return n},r.prototype.collides=function(t){var i=this.data;if(!c(t,i))return!1;for(var n=[];i;){for(var r=0;r<i.children.length;r++){var e=i.children[r],a=i.leaf?this.toBBox(e):e;if(c(t,a)){if(i.leaf||m(t,a))return!0;n.push(e)}}i=n.pop()}return!1},r.prototype.load=function(t){if(!t||!t.length)return this;if(t.length<this._minEntries){for(var i=0;i<t.length;i++)this.insert(t[i]);return this}var n=this._build(t.slice(),0,t.length-1,0);if(this.data.children.length)if(this.data.height===n.height)this._splitRoot(this.data,n);else{if(this.data.height<n.height){var r=this.data;this.data=n,n=r}this._insert(n,this.data.height-n.height-1,!0)}else this.data=n;return this},r.prototype.insert=function(t){return t&&this._insert(t,this.data.height-1),this},r.prototype.clear=function(){return this.data=p([]),this},r.prototype.remove=function(t,i){if(!t)return this;for(var n,r,a,h=this.data,o=this.toBBox(t),s=[],l=[];h||s.length;){if(h||(h=s.pop(),r=s[s.length-1],n=l.pop(),a=!0),h.leaf){var f=e(t,h.children,i);if(-1!==f)return h.children.splice(f,1),s.push(h),this._condense(s),this}a||h.leaf||!m(h,o)?r?(n++,h=r.children[n],a=!1):h=null:(s.push(h),l.push(n),n=0,r=h,h=h.children[0])}return this},r.prototype.toBBox=function(t){return t},r.prototype.compareMinX=function(t,i){return t.minX-i.minX},r.prototype.compareMinY=function(t,i){return t.minY-i.minY},r.prototype.toJSON=function(){return this.data},r.prototype.fromJSON=function(t){return this.data=t,this},r.prototype._all=function(t,i){for(var n=[];t;)t.leaf?i.push.apply(i,t.children):n.push.apply(n,t.children),t=n.pop();return i},r.prototype._build=function(t,i,n,r){var e,h=n-i+1,o=this._maxEntries;if(h<=o)return a(e=p(t.slice(i,n+1)),this.toBBox),e;r||(r=Math.ceil(Math.log(h)/Math.log(o)),o=Math.ceil(h/Math.pow(o,r-1))),(e=p([])).leaf=!1,e.height=r;var s=Math.ceil(h/o),l=s*Math.ceil(Math.sqrt(o));d(t,i,n,l,this.compareMinX);for(var f=i;f<=n;f+=l){var u=Math.min(f+l-1,n);d(t,f,u,s,this.compareMinY);for(var m=f;m<=u;m+=s){var c=Math.min(m+s-1,u);e.children.push(this._build(t,m,c,r-1))}}return a(e,this.toBBox),e},r.prototype._chooseSubtree=function(t,i,n,r){for(;r.push(i),!i.leaf&&r.length-1!==n;){for(var e=1/0,a=1/0,h=void 0,o=0;o<i.children.length;o++){var s=i.children[o],l=f(s),u=(m=t,c=s,(Math.max(c.maxX,m.maxX)-Math.min(c.minX,m.minX))*(Math.max(c.maxY,m.maxY)-Math.min(c.minY,m.minY))-l);u<a?(a=u,e=l<e?l:e,h=s):u===a&&l<e&&(e=l,h=s)}i=h||i.children[0]}var m,c;return i},r.prototype._insert=function(t,i,n){var r=n?t:this.toBBox(t),e=[],a=this._chooseSubtree(r,this.data,i,e);for(a.children.push(t),o(a,r);i>=0&&e[i].children.length>this._maxEntries;)this._split(e,i),i--;this._adjustParentBBoxes(r,e,i)},r.prototype._split=function(t,i){var n=t[i],r=n.children.length,e=this._minEntries;this._chooseSplitAxis(n,e,r);var h=this._chooseSplitIndex(n,e,r),o=p(n.children.splice(h,n.children.length-h));o.height=n.height,o.leaf=n.leaf,a(n,this.toBBox),a(o,this.toBBox),i?t[i-1].children.push(o):this._splitRoot(n,o)},r.prototype._splitRoot=function(t,i){this.data=p([t,i]),this.data.height=t.height+1,this.data.leaf=!1,a(this.data,this.toBBox)},r.prototype._chooseSplitIndex=function(t,i,n){for(var r,e,a,o,s,l,u,m=1/0,c=1/0,p=i;p<=n-i;p++){var d=h(t,0,p,this.toBBox),x=h(t,p,n,this.toBBox),v=(e=d,a=x,o=void 0,s=void 0,l=void 0,u=void 0,o=Math.max(e.minX,a.minX),s=Math.max(e.minY,a.minY),l=Math.min(e.maxX,a.maxX),u=Math.min(e.maxY,a.maxY),Math.max(0,l-o)*Math.max(0,u-s)),M=f(d)+f(x);v<m?(m=v,r=p,c=M<c?M:c):v===m&&M<c&&(c=M,r=p)}return r||n-i},r.prototype._chooseSplitAxis=function(t,i,n){var r=t.leaf?this.compareMinX:s,e=t.leaf?this.compareMinY:l;this._allDistMargin(t,i,n,r)<this._allDistMargin(t,i,n,e)&&t.children.sort(r)},r.prototype._allDistMargin=function(t,i,n,r){t.children.sort(r);for(var e=this.toBBox,a=h(t,0,i,e),s=h(t,n-i,n,e),l=u(a)+u(s),f=i;f<n-i;f++){var m=t.children[f];o(a,t.leaf?e(m):m),l+=u(a)}for(var c=n-i-1;c>=i;c--){var p=t.children[c];o(s,t.leaf?e(p):p),l+=u(s)}return l},r.prototype._adjustParentBBoxes=function(t,i,n){for(var r=n;r>=0;r--)o(i[r],t)},r.prototype._condense=function(t){for(var i=t.length-1,n=void 0;i>=0;i--)0===t[i].children.length?i>0?(n=t[i-1].children).splice(n.indexOf(t[i]),1):this.clear():a(t[i],this.toBBox)},r});
 
-},{}],38:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -42136,7 +42140,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],39:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (setImmediate,clearImmediate){(function (){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -42215,4 +42219,4 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
   delete immediateIds[id];
 };
 }).call(this)}).call(this,require("timers").setImmediate,require("timers").clearImmediate)
-},{"process/browser.js":38,"timers":39}]},{},[1]);
+},{"process/browser.js":37,"timers":38}]},{},[1]);

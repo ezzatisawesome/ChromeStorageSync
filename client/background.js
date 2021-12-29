@@ -1,19 +1,18 @@
 const { remove } = require('lodash');
-const { mongoUrl } = require('./mongoUrl.mjs')
 var minimongo = require('minimongo');
 
 var LocalDb = minimongo.IndexedDb;
 var RemoteDb = minimongo.RemoteDb
 var localDb = new LocalDb({ namespace: 'TestingStorage' })
-var remoteDb = new RemoteDb(mongoUrl)
+var remoteDb = new RemoteDb('http://localhost:3000/')
+
+console.log(remoteDb)
 
 const collections = { C1: 'c1', C2: 'c2' }
 
 chrome.runtime.onInstalled.addListener(() => {
     localDb.addCollection(collections.C1)
-    localDb.addCollection(collections.C2)
     remoteDb.addCollection(collections.C1)
-    remoteDb.addCollection(collections.C2)
 })
 
 chrome.omnibox.onInputEntered.addListener((text) => {
@@ -22,7 +21,7 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     const data = { [`${textSplit[3]}`]: textSplit[4] }
 
 
-    if (textSplit[0] === 'L') {
+    if (textSplit[0] === 'l') {
         switch (textSplit[1]) {
             case 'c':
                 if (collection === collections.C1) {
@@ -60,8 +59,14 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     } else {
         switch (textSplit[1]) {
             case 'c':
+                console.log('case "c"')
                 if (collection === collections.C1) {
-                    remoteDb.collections[collections.C1].upsert(data)
+                    console.log('upserting data')
+                    try {
+                        console.log(data)
+                        remoteDb.collections[collections.C1].upsert(data)
+                    }
+                    catch { console.log('err') }
                 }
                 else {
                     remoteDb.collections[collections.C2].upsert(data)

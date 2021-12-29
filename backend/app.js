@@ -2,6 +2,7 @@ import createError from 'http-errors'
 import express from 'express'
 import path from 'path'
 import logger from 'morgan'
+import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import { MongoClient } from 'mongodb'
 import { mongoUrl } from './mongoUrl.js'
@@ -27,14 +28,15 @@ export const c1col = database.collection('c1');
 
 var app = express();
 
-app.use('/scratch', c1routes);
+app.use('/c1', c1routes);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 app.use(logger('dev'));
-app.use(express.json());
+//app.use(express.json());
+app.use(bodyParser.json())
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

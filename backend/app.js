@@ -3,19 +3,31 @@ import express from 'express'
 import path from 'path'
 import logger from 'morgan'
 import cookieParser from 'cookie-parser'
-import mongoose from 'mongoose'
+import { MongoClient } from 'mongodb'
 import { mongoUrl } from './mongoUrl.js'
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import c1routes from './routes/c1.js'
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-mongoose.connect(mongoUrl)
+const client = new MongoClient(mongoUrl);
+async function connect() {
+  // Connect the client to the server
+  await client.connect();
+  // Establish and verify connection
+  await client.db("admin").command({ ping: 1 });
+  console.log("Connected successfully to server");
+}
 
-import indexRouter from './routes/index.js'
+await connect();
+const database = client.db('SpadeTesting');
+export const c1col = database.collection('c1');
 
 var app = express();
+
+app.use('/scratch', c1routes);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,8 +38,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -45,4 +55,4 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-export default app
+export default app;

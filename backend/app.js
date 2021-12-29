@@ -1,10 +1,19 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+import createError from 'http-errors'
+import express from 'express'
+import path from 'path'
+import logger from 'morgan'
+import cookieParser from 'cookie-parser'
+import mongoose from 'mongoose'
+import { mongoUrl } from './mongoUrl.js'
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 
-var indexRouter = require('./routes/index');
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+mongoose.connect(mongoUrl)
+
+import indexRouter from './routes/index.js'
 
 var app = express();
 
@@ -36,4 +45,4 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+export default app

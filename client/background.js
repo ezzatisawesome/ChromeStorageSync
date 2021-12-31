@@ -5,7 +5,7 @@ var LocalDb = minimongo.IndexedDb;
 var RemoteDb = minimongo.RemoteDb
 var localDb = new LocalDb({ namespace: 'TestingStorage' })
 var remoteDb = new RemoteDb('http://localhost:3000/')
-var replicatingDb = new minimongo.ReplicatingDb(localDb, remoteDb)
+var replicatingDb = new minimongo.HybridDb(localDb, remoteDb)
 
 console.log(remoteDb)
 
@@ -18,12 +18,12 @@ chrome.runtime.onInstalled.addListener(() => {
 })
 
 chrome.omnibox.onInputEntered.addListener((text) => {
-    const textSplit = text.split(' ')
-    const collection = textSplit[2]
-    const data = { [textSplit[3]]: textSplit[4] }
-    const data2 = { [textSplit[3]]: textSplit[4] }
-    console.log('old data', data)
-    console.log('new data', data2)
+    // const textSplit = text.split(' ')
+    // const collection = textSplit[2]
+    // const data = { [textSplit[3]]: textSplit[4] }
+    // const data2 = { [textSplit[3]]: textSplit[4] }
+    // console.log('old data', data)
+    // console.log('new data', data2)
 
 
     // if (textSplit[0] === 'l') {
@@ -101,7 +101,11 @@ chrome.omnibox.onInputEntered.addListener((text) => {
     //     }
     // }
 
-    switch (textSplit[1]) {
+    const textSplit = text.split(' ')
+    const collection = textSplit[1]
+    const data = (textSplit[0] === 'u') ? undefined : { [textSplit[2]]: textSplit[3] }
+
+    switch (textSplit[0]) {
         case 'c':
             console.log('case "c"')
             if (collection === collections.C1) {
@@ -133,6 +137,9 @@ chrome.omnibox.onInputEntered.addListener((text) => {
             else {
                 replicatingDb.collections[collections.C2].remove(data, () => { })
             }
+            break
+        case 'u':
+            replicatingDb.collections[collections.C1].c1.upload(() => console.log('uploaded'), () => { })
             break
         default:
             console.log(`${operation} is not a valid operation.`)

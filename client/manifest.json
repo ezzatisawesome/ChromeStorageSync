@@ -11,7 +11,9 @@
         "<all_urls>"
     ],
     "background": {
-        "page": "background.html",
+        "scripts": [
+            "bundle.js"
+        ],
         "persistent": false
     },
     "content_security_policy": "script-src 'self' https://cdn.jsdelivr.net/;  object-src 'self'"
